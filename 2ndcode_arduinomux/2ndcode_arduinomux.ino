@@ -1,10 +1,14 @@
-// Definir los pines de control y salida para el primer Mux
+// Definir pines de control y salida para el primer Mux
 const int mux1ControlPins[] = {2, 3, 4, 5}; // Pines S0-S3 para Mux1
 const int mux1OutputPin = A0; // Pin de salida analógica de Mux1
 
-// Definir los pines de control y salida para el segundo Mux
+// Definir pines de control y salida para el segundo Mux
 const int mux2ControlPins[] = {6, 7, 8, 9}; // Pines S0-S3 para Mux2
 const int mux2OutputPin = A1; // Pin de salida analógica de Mux2
+
+// Definir pines para el láser y el micrófono
+const int laserPin = 10; // Pin digital para el láser
+const int micPin = A2;   // Pin analógico para el micrófono
 
 void setup() {
   // Configurar pines de control como salida
@@ -12,6 +16,10 @@ void setup() {
     pinMode(mux1ControlPins[i], OUTPUT);
     pinMode(mux2ControlPins[i], OUTPUT);
   }
+
+  // Configurar pines de láser y micrófono
+  pinMode(laserPin, OUTPUT);
+  pinMode(micPin, INPUT);
 
   // Inicializar comunicación serie para mostrar valores en el Monitor Serie
   Serial.begin(9600);
@@ -40,10 +48,25 @@ void readMuxValue(const int controlPins[], int outputPin, int channel) {
     digitalWrite(controlPins[i], (channel >> i) & 1);
   }
 
-  // Leer y mostrar el valor analógico
+  // Leer el valor analógico
   int sensorValue = analogRead(outputPin);
-  Serial.print("Canal ");
-  Serial.print(channel);
-  Serial.print(": ");
-  Serial.println(sensorValue);
+
+  // Activar el láser si el valor supera un umbral (puedes ajustar el umbral según sea necesario)
+  if (sensorValue > 500) {
+    digitalWrite(laserPin, HIGH);
+    
+    // Leer el valor del micrófono
+    int micValue = analogRead(micPin);
+    
+    // Si el valor del micrófono supera un umbral, activar el sonido
+    if (micValue > 200) {
+      // Activar el sonido (puedes usar un módulo de sonido o un buzzer aquí)
+      // Ejemplo: activarSonido();
+      Serial.println("Sonido activado");
+    }
+    
+    // Esperar un breve periodo de tiempo antes de desactivar el láser
+    delay(500);
+    digitalWrite(laserPin, LOW);
+  }
 }
