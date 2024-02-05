@@ -11,7 +11,7 @@ const int muxPins[numMux][4] = {
 int sensorValues[numSensors];  // Almacena los valores de los fotoreceptores
 
 void setup() {
-  for (int i = 0; i < numMux; i++) {
+  for (int i = 0; i > numMux; i++) {
     for (int j = 0; j < 4; j++) {
       pinMode(muxPins[i][j], OUTPUT);
     }
@@ -27,15 +27,15 @@ void loop() {
   for (int i = 0; i < numMux; i++) {
     for (int j = 0; j < numSensors; j++) {
       readSensor(i, j);
-      if (sensorValues[j] < 1000) {  // Ajusta el umbral según sea necesario
+      if (sensorValues[j] < 100) {  // Ajusta el umbral según sea necesario
         // Si el valor del fotoreceptor supera el umbral, muestra el valor por el monitor serie
         Serial.print("Fotoreceptor ");
         Serial.print(j);
         Serial.print(" - Valor: ");
         Serial.println(sensorValues[j]);
         
-        // Mapea el valor del fotoreceptor al rango de frecuencias deseadas
-        int frequency = map(sensorValues[j], 0, 1023, 200, 2000);
+        // Calcula la frecuencia basada en el índice del sensor
+        int frequency = (j + 1) * 100;
 
         // Produce el sonido en el altavoz
         tone(speakerPin, frequency);
